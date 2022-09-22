@@ -1,7 +1,8 @@
 # Remote phone camera controls for my van
 
 
-## DEMO
+#### DEMO
 
-server: `https://van-spy.vercel.app?s=uniqserverid1&m`
-client: `https://van-spy.vercel.app?s=uniqserverid1`
+server: https://van-spy.vercel.app?s=uniqserverid1&m
+
+client: https://van-spy.vercel.app?s=uniqserverid1
