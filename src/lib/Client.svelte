@@ -1,39 +1,33 @@
 <script lang="ts">
   import Peer from 'peerjs';
-  import { createEmptyVideoTrack, getPeerId, MASTER_PEER_ID } from './utils';
+  import { createEmptyVideoTrack, getServerID, getClientID } from './utils';
 
-  const peerId = getPeerId();
+  const peerId = getClientID();
   const peer = new Peer(peerId);
+  const serverId = getServerID()
+  let pingMessage = ''
 
-  peer.on('connection', (conn) => {
-      conn.on('data', (data) => {
-      })
-      conn.on('open', () => {
-        conn.send('hello!')
-      })
-      peer.on('call', function (call) {
-      })
-    })
   const ping = () => {
     try {
-      const master = MASTER_PEER_ID
-      
-      const conn = peer.connect(master)
-      console.log('before connect', master, peerId, conn)
+    
+      pingMessage = '...'
+      const conn = peer.connect(serverId)
+      conn.on('data', (data: string) => {
+        pingMessage = data
+      })
       conn.on('open', () => {
         conn.send('hi!')
       })
+
     } catch (e) {
       console.error(e)
     }
   }
 
   const call = () => {
-    const master = MASTER_PEER_ID
-    console.log('calling', master, peer)
     const videoTrack = createEmptyVideoTrack({ width: 0, height: 0 });
     const mediaStream = new MediaStream([videoTrack]);
-    const peercall = peer.call(master, mediaStream);
+    const peercall = peer.call(serverId, mediaStream);
     
     peercall.on('stream', function (stream) {
       setTimeout(function () {
@@ -42,15 +36,18 @@
     });
   };
 </script>
-<div>{peerId}</div>
+<div>ClientID: {peerId}</div>
+<div>ServerID: {serverId}</div>
 <video
-  id="remVideo"
-  width="400px"
-  height="auto"
-  autoPlay
-/>
+    id="remVideo"
+    width="400px"
+    height="auto"
+    autoPlay
+    />
 <div>
-    <button on:click={ping}>ping</button>
+
+    <button on:click={ping}>ping </button>
     <button on:click={call}>call</button>
 </div>
+<div>{pingMessage}</div>
 

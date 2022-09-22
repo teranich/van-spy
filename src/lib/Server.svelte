@@ -1,17 +1,17 @@
 <script lang="ts">
   import Peer from 'peerjs';
-  import { getPeerId } from './utils';
+  import { getServerID } from './utils';
 
-  const peerId = getPeerId();
-  const peer = new Peer(peerId);
-  console.log('before log connection', peerId, peer)
+  const serverID = getServerID();
+  const peer = new Peer(serverID);
+  let lastClientId = ''
+
   peer.on('connection', (conn) => {
-    console.log('connected', conn)
+    lastClientId = conn.peer
     conn.on('data', (data) => {
-      console.log('data=', data, conn.peer);
     });
     conn.on('open', () => {
-      conn.send('hello!');
+      conn.send('pong!');
     });
     peer.on('call', function (call) {
       setTimeout(() => {
@@ -27,7 +27,7 @@
         video.srcObject = mediaStream
 
         peercall.answer(mediaStream);
-        
+        lastClientId = peercall.peer
       })
       .catch(function (err) {
         console.log(err.name + ': ' + err.message);
@@ -35,5 +35,9 @@
   };
 </script>
 
-<div>{peerId}</div>
+<div>ServerID: {serverID}</div>
+{#if lastClientId}
+    <div>Last ClientID: {lastClientId}</div>
+{/if}
+
 <video id="myVideo" width="400px" height="auto" autoPlay />
