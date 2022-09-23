@@ -24,9 +24,27 @@
     }
   }
 
-  const call = () => {
+  const getMediaStream = () => {
     const videoTrack = createEmptyVideoTrack({ width: 0, height: 0 });
-    const mediaStream = new MediaStream([videoTrack]);
+    const fallbackStream = new MediaStream([videoTrack]);
+    return navigator.mediaDevices
+      .getUserMedia({ audio: true, video: true }) //{ facingMode: { exact: "environment" } }
+      .then(function (mediaStream) {
+        console.log('stream?', mediaStream)
+        
+        return mediaStream instanceof MediaStream  
+        ? mediaStream 
+        : fallbackStream;
+    }).catch(e => {
+      console.error(e);
+      return fallbackStream
+    })
+    
+
+
+  }
+  const call = () => {
+    getMediaStream().then((mediaStream) => {
     const peercall = peer.call(serverId, mediaStream);
     
     peercall.on('stream', function (stream) {
@@ -34,6 +52,8 @@
         document.getElementById('remVideo').srcObject = peercall.remoteStream;
       }, 1500);
     });
+  })
+
   };
 </script>
 <div>ClientID: {peerId}</div>
@@ -50,4 +70,5 @@
     <button on:click={call}>call</button>
 </div>
 <div>{pingMessage}</div>
+
 

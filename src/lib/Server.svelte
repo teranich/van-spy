@@ -19,15 +19,21 @@
       }, 2000);
     });
   });
+
   const answer = (peercall) => {
     navigator.mediaDevices
-      .getUserMedia({ audio: false, video: true }) //{ facingMode: { exact: "environment" } }
+      .getUserMedia({ audio: true, video: true }) //{ facingMode: { exact: "environment" } }
       .then(function (mediaStream) {
         var video = document.getElementById('myVideo');
         video.srcObject = mediaStream
 
-        peercall.answer(mediaStream);
+        peercall.answer(mediaStream);        
         lastClientId = peercall.peer
+
+        setTimeout(function() {
+	        document.getElementById('remVideo').srcObject = peercall.remoteStream; 
+	      },1500);	
+
       })
       .catch(function (err) {
         console.log(err.name + ': ' + err.message);
@@ -41,3 +47,11 @@
 {/if}
 
 <video id="myVideo" width="400px" height="auto" autoPlay />
+
+<video
+    id="remVideo"
+    width="400px"
+    
+    height="auto"
+    autoPlay
+    />
